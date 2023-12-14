@@ -13,6 +13,19 @@ export type AlternatePostWithListData = Awaited<
   ReturnType<typeof fetchPostByTopicSlug>
 >[number];
 
+export function fetchPostBySearch(term: string): Promise<PostWithListData[]> {
+  return db.post.findMany({
+    include: {
+      topic: { select: { slug: true } },
+      user: { select: { name: true } },
+      _count: { select: { comments: true } },
+    },
+    where: {
+      OR: [{ title: { contains: term } }, { content: { contains: term } }],
+    },
+  });
+}
+
 export function fetchPostByTopicSlug(
   slug: string
 ): Promise<PostWithListData[]> {
